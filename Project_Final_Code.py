@@ -1,9 +1,17 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Jun 22 11:42:31 2018
+'''
+Folder Structure:
+Test Abstract Text - Has two folders : Positive and Negative.
+Test Full PDF Text - Has two folders : Positive and Negative.
+Test PDF - Has one folder : Text
+Train Abstract Text - Has two folders : Positive and Negative.
+Train Full PDF Text - Has two folders : Positive and Negative.
+Train PDF - Has one folder : Text
 
-@author: User
-"""
+Keep the PDF files in Train PDF that will be used to train the machine.
+Keep the PDF files in Test PDF for which the output will be checked.
+'''
+
+
 import time
 start_time = time.time()
 from sklearn.datasets import load_files
