@@ -3,7 +3,7 @@ The process of developing systematic reviews is a well established method of col
 
 The analysis and performance of this framework is explained in the following paper:
 
-[Shubhaditya Goswami, Sukanya Pal, Simon Goldsworthy and Tanmay Basu. An Effective Machine Learning Framework for Data Elements Extraction from the Literature of Anxiety Outcome Measures to Build Systematic Review. In Proceedings of International Conference on Business Information Systems, pp 247-258, 2019.] (https://link.springer.com/chapter/10.1007/978-3-030-20485-3_19).
+[Shubhaditya Goswami, Sukanya Pal, Simon Goldsworthy and Tanmay Basu. An Effective Machine Learning Framework for Data Elements Extraction from the Literature of Anxiety Outcome Measures to Build Systematic Review. In Proceedings of International Conference on Business Information Systems, pp 247-258, 2019](https://link.springer.com/chapter/10.1007/978-3-030-20485-3_19).
 
 ## How to run the model?
 
