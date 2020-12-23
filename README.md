@@ -12,7 +12,7 @@ The training data to train the classifier can be developed by running 'build_tra
 btd=build_training_data('/home/xyz/data_extraction/')
 btd.build_training_data()
 ```
-The desired data elements of anxiety outcome measures can be extracted from the individual test samples by executing 'data_extraction.py'. Create a directory, called, 'output' in the main project path to store the outputs of individual test samples. Therefore, run the following lines to get data elements of individual test samples. 
+The desired data elements of anxiety outcome measures can be extracted from the individual test samples by executing 'data_extraction.py'. Create a directory, called, `output` in the main project path to store the outputs of individual test samples. Therefore, run the following lines to get data elements of individual test samples. 
 
 ```
 clf=data_extraction('/home/xyz/data_extraction/')
