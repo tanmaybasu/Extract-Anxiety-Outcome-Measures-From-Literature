@@ -7,13 +7,8 @@ Created on Tuesday, December 22, 2020 @ 20:22:47
 """
 
 from data_extraction import data_extraction
-from build_training_data import build_training_data
 
-#opt = input("Enter Data Path \n")
-#clf=data_extraction(opt)
 
-btd=build_training_data('/Users/basut/anxiety_outcome_measures_data_extraction/')
-btd.build_training_data()
-
-clf=data_extraction('/Users/basut/anxiety_outcome_measures_data_extraction/')
-clf.classify()
+de=data_extraction('/Users/basut/anxiety_outcome_measures_data_extraction/')
+de.build_training_data() 
+de.data_extraction()
