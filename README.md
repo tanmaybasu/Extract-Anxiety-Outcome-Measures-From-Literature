@@ -3,4 +3,21 @@ The process of developing systematic reviews is a well established method of col
 
 The analysis and performance of this framework is explained in the following paper:
 
-Shubhaditya Goswami, Sukanya Pal, Simon Goldsworthy and Tanmay Basu. An Effective Machine Learning Framework for Data Elements Extraction from the Literature of Anxiety Outcome Measures to Build Systematic Review. In Proceedings of International Conference on Business Information Systems, pp 247-258, 2019. (https://link.springer.com/chapter/10.1007/978-3-030-20485-3_19).
+[Shubhaditya Goswami, Sukanya Pal, Simon Goldsworthy and Tanmay Basu. An Effective Machine Learning Framework for Data Elements Extraction from the Literature of Anxiety Outcome Measures to Build Systematic Review. In Proceedings of International Conference on Business Information Systems, pp 247-258, 2019.] (https://link.springer.com/chapter/10.1007/978-3-030-20485-3_19).
+
+## How to run the model?
+
+The training data to train the classifier is developed by 'build_training_data.py' using PDF files of the publications. Pass the path of the project e.g., /home/xyz/data_extraction/ as a parameter of this function. Create the following directories inside this path: 1) training_data 2) test_data. Therefore store the PDFs for training and test data in the respective directories. Subsequently, run the following lines to built the training data.
+
+```
+btd=build_training_data('/home/xyz/data_extraction/')
+btd.build_training_data()
+```
+The desired data elemenst of anxiety outcome measures can be extracted from the individual test samples by executing 'data_extraction.py'. Create a directory, called, 'output' in the same project path to store the outputs of individual test samples. Therefore, run the following lines to get data elements of the test samples. 
+
+```
+clf=data_extraction('/home/xyz/data_extraction/')
+clf.classify()
+```
+
+An example code to implement the whole model is uploaded as `testing_data_extraction.py`. For any further query, you may reach out to me at welcometanmay@gmail.com
