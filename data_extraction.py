@@ -50,7 +50,7 @@ class data_extraction():
            
 # Check if a sentence is relevant to a keyphrase 
      def check_relevant_sentences(self,sentence,keyphrases):
-        sentence = re.sub(r'[^a-zA-Z0-9.?:!$\n]', ' ', sentence)    # Remove special character 
+        sentence = re.sub(r'[^a-zA-Z0-9.?:!$\n]', ' ', sentence)        # Remove special character 
         for phrase in keyphrases:
             if sentence.find(phrase)>=0 and re.findall(r'\d+\.\d+', sentence)!=[]:
                 return 1
@@ -80,8 +80,8 @@ class data_extraction():
             fn=open(self.path+'training_irrelevant_class_data.csv',"w")  
             for item in trn_files:
                 count+=1
-                text=self.pdf_to_text(self.path+'training_data/'+item)                         # PDF to text conversion 
-                text=self.text_refinement(text)                     # Cleaning text file 
+                text=self.pdf_to_text(self.path+'training_data/'+item)      # PDF to text conversion 
+                text=self.text_refinement(text)                             # Cleaning text file 
                 fp.write('trn '+str(count)+',')
                 fn.write(str(count)+',')
                 text=re.sub(r',', r';', text)      # replacing , by ; to build the csv properly 
@@ -137,7 +137,7 @@ class data_extraction():
             'clf__n_estimators':(30,50,100,200),
             'clf__max_depth':(10,20),
             }          
-        # SVM 
+        # Support Vector Machine 
         elif opt=='s': 
             print('\n\t### Classification of given texts using Linear SVM Classifier ### \n')
             ext2='svm'
@@ -149,13 +149,13 @@ class data_extraction():
             print('Select a valid classifier \n')
             sys.exit(0)
     # Classificiation and feature selection pipelines
-        if no_term==0:                                  # Use all the terms of the vocabulary
+        if no_term==0:                                  # To use all the terms of the vocabulary
             pipeline = Pipeline([
                 ('vect', CountVectorizer(token_pattern=r'\b\w+\b',stop_words=stopwords.words('english'))),
                 ('tfidf', TfidfTransformer(use_idf=True,smooth_idf=True)),     
                 ('clf', clf),]) 
         else:
-            try:                                        # Use selected terms of the vocabulary
+            try:                                        # To use selected terms of the vocabulary
                 pipeline = Pipeline([
                     ('vect', CountVectorizer(token_pattern=r'\b\w+\b',stop_words=stopwords.words('english'))),
                     ('tfidf', TfidfTransformer(use_idf=True,smooth_idf=True)),
@@ -203,7 +203,7 @@ class data_extraction():
                 text=text.split(',')[1]
                 sentences = tokenize.sent_tokenize(text)
                 for sentence in sentences:
-                    sentence=re.sub(r'\d+\.\d+', '', sentence)          # Remove floating point numbers
+                    sentence=re.sub(r'\d+\.\d+', '', sentence)        # Remove numbers from text to reduce text features 
                     trn_data.append(sentence)           
                     trn_cat.append(0)
                     p1=p1+1
@@ -215,7 +215,7 @@ class data_extraction():
                 text=text.split(',')[1]
                 sentences = tokenize.sent_tokenize(text)
                 for sentence in sentences:
-                    sentence=re.sub(r'\d+\.\d+', '', sentence)          # Remove floating point numbers
+                    sentence=re.sub(r'\d+\.\d+', '', sentence)        # Remove numbers from text to reduce text features 
                     trn_data.append(sentence)           
                     trn_cat.append(1)
                     p2=p2+1
@@ -239,9 +239,9 @@ class data_extraction():
                 out = open(self.path+'output/tst'+str(count)+'.txt',"w") 
                 # Preparing Test Samples 
                 if text!='':
-                    text=self.text_refinement(text)                     # Cleaning text file 
+                    text=self.text_refinement(text)                   # Cleaning text file 
                     sentences = tokenize.sent_tokenize(text)
-                    for sentence in sentences:                       # Extracting sentences
+                    for sentence in sentences:                       # Extracting sentences from text
                         tst_data.append(sentence)  
                         p3=p3+1
                 # Cretaing the output file
@@ -264,4 +264,4 @@ class data_extraction():
             print('No of sentences belong to RELEVANT class of the training corpus: '+ str(p1)) 
             print('No of sentences belong to IRRELEVANT class of the training corpus: '+ str(p2)) 
             print('No of sentences belong to the TEST corpus: '+ str(p3)) 
- 
+    
