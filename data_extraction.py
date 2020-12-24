@@ -79,31 +79,33 @@ class data_extraction():
             fp=open(self.path+'training_relevant_class_data.csv',"w")
             fn=open(self.path+'training_irrelevant_class_data.csv',"w")  
             for item in trn_files:
-                count+=1
-                text=self.pdf_to_text(self.path+'training_data/'+item)      # PDF to text conversion 
-                text=self.text_refinement(text)                             # Cleaning text file 
-                fp.write('trn '+str(count)+',')
-                fn.write(str(count)+',')
-                text=re.sub(r',', r';', text)      # replacing , by ; to build the csv properly 
-                text=re.sub(r'\n', r' ', text)     # replacing \n by ; to build the csv properly
-                if text!='':
-                    sentences=nltk.sent_tokenize(text)
-                    for sentence in sentences:
-                        if sentence!='':
-                            phrase_score=self.check_relevant_sentences(sentence,keyphrases)
-                            if phrase_score==1:
-                                fp.write(sentence+' ')
-                            elif phrase_score==0 and re.findall(r'\d+', sentence)==[]:
-                                fn.write(sentence+' ') 
+                if item.find('.pdf')>0:                       # Checking if it is a PDF file
+                    count+=1
+                    text=self.pdf_to_text(self.path+'training_data/'+item)      # PDF to text conversion 
+                    text=self.text_refinement(text)                             # Cleaning text file 
+                    fp.write('trn '+str(count)+',')
+                    fn.write(str(count)+',')
+                    text=re.sub(r',', r';', text)      # replacing , by ; to build the csv properly 
+                    text=re.sub(r'\n', r' ', text)     # replacing \n by ' ' to build the csv properly
+                    if text!='':
+                        sentences=nltk.sent_tokenize(text)
+                        for sentence in sentences:
+                            if sentence!='':
+                                phrase_score=self.check_relevant_sentences(sentence,keyphrases)
+                                if phrase_score==1:
+                                    fp.write(sentence+' ')
+                                elif phrase_score==0 and re.findall(r'\d+', sentence)==[]:
+                                    fn.write(sentence+' ') 
+    
+                    else:
+                        print('Empty text for file: '+item+'\n') 
                     fp.write('\n')
                     fn.write('\n')
-                else:
-                    print('Empty text for file: '+item+'\n') 
          fp.close()
          fn.close()
         
 # Selection of classifiers and building classification pipeline 
-     def classification_pipeline(self,opt,no_term,trn_data,trn_cat):        
+     def classification_pipeline(self,opt,no_of_term,trn_data,trn_cat):        
         # Logistic Regression 
         if opt=='lr':
             print('\n\t### Classification of given texts using Logistic Regression Classifier ### \n')
@@ -149,7 +151,7 @@ class data_extraction():
             print('Select a valid classifier \n')
             sys.exit(0)
     # Classificiation and feature selection pipelines
-        if no_term==0:                                  # To use all the terms of the vocabulary
+        if no_of_term==0:                                  # To use all the terms of the vocabulary
             pipeline = Pipeline([
                 ('vect', CountVectorizer(token_pattern=r'\b\w+\b',stop_words=stopwords.words('english'))),
                 ('tfidf', TfidfTransformer(use_idf=True,smooth_idf=True)),     
@@ -159,8 +161,8 @@ class data_extraction():
                 pipeline = Pipeline([
                     ('vect', CountVectorizer(token_pattern=r'\b\w+\b',stop_words=stopwords.words('english'))),
                     ('tfidf', TfidfTransformer(use_idf=True,smooth_idf=True)),
-                    ('feature_selection', SelectKBest(chi2, k=no_term)),    
-            #        ('feature_selection', SelectKBest(mutual_info_classif, k=no_term)),        
+                    ('feature_selection', SelectKBest(chi2, k=no_of_term)),    
+            #        ('feature_selection', SelectKBest(mutual_info_classif, k=no_of_term)),        
                     ('clf', clf),]) 
             except:                                  # If the input is wrong
                 print('Wrong Input. Enter number of terms correctly. \n')
@@ -185,9 +187,9 @@ class data_extraction():
                        "\n\t 'ls' to select Linear SVC" 
                        "\n\t 's' to select SVM" 
                        "\n\t 'n' to select Naive Bayes \n\n")
-        no_term= input("Enter: \n\t '0' to use all the terms of the vocabulary" 
+        no_of_term= input("Enter: \n\t '0' to use all the terms of the vocabulary" 
                        "\n\t 'DESIRED' number of terms to choose using chi-square statistics \n\n")
-        no_term=int(no_term)
+        no_of_term=int(no_of_term)
         trn_data=[];    trn_cat=[];   
         p1=0; p2=0; p3=0
     
@@ -220,7 +222,7 @@ class data_extraction():
                     trn_cat.append(1)
                     p2=p2+1
     # Classification pipeline                   
-        clf,ext2=self.classification_pipeline(opt,no_term,trn_data,trn_cat)   
+        clf,ext2=self.classification_pipeline(opt,no_of_term,trn_data,trn_cat)   
     # Classification of the test samples  
         if not os.path.isdir(self.path+'test_data'):
             print('The directory test_data does not exist \n')
@@ -232,36 +234,36 @@ class data_extraction():
             print('There is no test samples in the directory \n')
         else:
             for item in tst_files:
-                count+=1
-                tst_data=[];   
-                text=self.pdf_to_text(self.path+'test_data/'+item)   
-                out = open(self.path+'output/tst'+str(count)+'.txt',"w") 
-                # Preparing Test Samples 
-                if text!='':
-                    text=self.text_refinement(text)                   # Cleaning text file 
-                    sentences = tokenize.sent_tokenize(text)
-                    for sentence in sentences:                       # Extracting sentences from text
-                        tst_data.append(sentence)  
-                        p3=p3+1
-                # Cretaing the output file
-                    out.write('\n Using '+ext2+' Classifier: \n\n')   
-                    out.write('Total No. of Sentences in Test Sample: '+str(p3)+'\n\n')
-                    out.write('The relevant sentences are as follow: \n')
-                # Classification
-                    predicted = clf.predict(tst_data) 
-                    nps=0
-                    for i in range(0,len(predicted)):
-                        if predicted[i] == 0: 
-                                nps=nps+1                 
-                                out.write('\n'+str(nps)+")  "+tst_data[i]+'\n')               
-                    print("Total No. of Relevant Sentences of Test Sample "+str(count)+" : %d\n" %nps)
+                if item.find('.pdf')>0:             # Checking if it is a PDF file               
+                    count+=1
+                    tst_data=[];   
+                    text=self.pdf_to_text(self.path+'test_data/'+item)   
+                    out = open(self.path+'output/tst'+str(count)+'.txt',"w") 
+                    # Preparing Test Samples 
+                    if text!='':
+                        text=self.text_refinement(text)                   # Cleaning text file 
+                        sentences = tokenize.sent_tokenize(text)
+                        for sentence in sentences:                       # Extracting sentences from text
+                            tst_data.append(sentence)  
+                            p3=p3+1
+                    # Cretaing the output file
+                        out.write('\n Using '+ext2+' Classifier: \n\n')   
+                        out.write('Total No. of Sentences in Test Sample: '+str(p3)+'\n\n')
+                        out.write('The relevant sentences are as follow: \n')
+                    # Classification
+                        predicted = clf.predict(tst_data) 
+                        nps=0
+                        for i in range(0,len(predicted)):
+                            if predicted[i] == 0: 
+                                    nps=nps+1                 
+                                    out.write('\n'+str(nps)+")  "+tst_data[i]+'\n')               
+                        print("Total No. of Relevant Sentences of Test Sample "+str(count)+" : %d\n" %nps)
+                        out.close()
+                    else:
+                        out.write('Test file '+str(count)+'is empty \n') 
+                        print('Test file '+str(count)+' is empty \n')
                     out.close()
-                else:
-                    out.write('Test file '+str(count)+'is empty \n') 
-                    print('Test file '+str(count)+' is empty \n')
-                out.close()
             print('No of sentences belong to RELEVANT class of the training corpus: '+ str(p1)) 
             print('No of sentences belong to IRRELEVANT class of the training corpus: '+ str(p2)) 
             print('No of sentences belong to the TEST corpus: '+ str(p3)) 
     
-
