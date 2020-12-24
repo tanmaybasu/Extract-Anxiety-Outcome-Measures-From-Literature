@@ -175,7 +175,7 @@ class data_extraction():
         grid = GridSearchCV(pipeline,parameters,scoring='f1_micro',cv=10)          
         grid.fit(trn_data,trn_cat)     
         clf= grid.best_estimator_
-        print(grid.best_params_)
+#        print(grid.best_params_)
         return clf,ext2
     
 # Classification of sentences containing desired data elements   
@@ -185,7 +185,7 @@ class data_extraction():
                        "\n\t 'ls' to select Linear SVC" 
                        "\n\t 's' to select SVM" 
                        "\n\t 'n' to select Naive Bayes \n\n")
-        no_term= input("Enter : \n\n\t '0' to use all the terms of the vocabulary" 
+        no_term= input("Enter: \n\t '0' to use all the terms of the vocabulary" 
                        "\n\t 'DESIRED' number of terms to choose using chi-square statistics \n\n")
         no_term=int(no_term)
         trn_data=[];    trn_cat=[];   
@@ -233,7 +233,6 @@ class data_extraction():
         else:
             for item in tst_files:
                 count+=1
-                print(' Processing Test Data '+str(count)+'\n')
                 tst_data=[];   
                 text=self.pdf_to_text(self.path+'test_data/'+item)   
                 out = open(self.path+'output/tst'+str(count)+'.txt',"w") 
@@ -255,7 +254,7 @@ class data_extraction():
                         if predicted[i] == 0: 
                                 nps=nps+1                 
                                 out.write('\n'+str(nps)+")  "+tst_data[i]+'\n')               
-                    print("Total No. of Relevant Sentences of Test Sample"+str(count)+" : %d\n" %nps)
+                    print("Total No. of Relevant Sentences of Test Sample "+str(count)+" : %d\n" %nps)
                     out.close()
                 else:
                     out.write('Test file '+str(count)+'is empty \n') 
@@ -265,3 +264,4 @@ class data_extraction():
             print('No of sentences belong to IRRELEVANT class of the training corpus: '+ str(p2)) 
             print('No of sentences belong to the TEST corpus: '+ str(p3)) 
     
+
