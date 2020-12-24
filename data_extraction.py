@@ -24,17 +24,28 @@ from sklearn.feature_selection import SelectKBest,chi2,mutual_info_classif
 class data_extraction():
      def __init__(self,path='/home/data_extrcation/'):
         self.path = path
-    # Text refinement
+
+# PDF to text conversion
+     def pdf_to_text(self,file):        
+        try:
+            doc = fitz.open(file, filetype = "pdf")        # PDF to text conversion  
+            texts=[] 
+            for page in doc:
+                texts.append(page.getText().encode("utf8"))                   
+            try:
+                text=b''.join(texts)                      # If Fitz return the text in binary mode 
+                text=text.decode('utf-8')                   
+            except:
+                text=''.join(texts)
+        except:
+            text='' 
+        return text
+
+# Text refinement
      def text_refinement(self,text='hello'):
         text = re.sub(r'[^!"#$%&\'()*+,-./:;<=>?@[\]^_`{|}~\n\w]+',' ', text)      # Remove special characters e.g., emoticons-😄. The ^ in the beginning ensures that all the natural characters will be kept. 
-#        text = re.sub(r'[^a-zA-Z0-9.?:!$\n]', ' ', text)                          # Remove special characters
         text=re.sub(r'[?]', '.', text)                                             # Replace '?' with '.' to properly identify floating point numbers 
         text=re.sub(r'([a-zA-Z0-9])([\),.!?;-]+)([a-zA-Z])', r'\1\2 \3', text )    # Space between delimmiter and letter   
-        text=re.sub(r'([a-z])([\.])([\s]*)([a-z])', r'\1 \3\4', text)              # Reomove '.' between two lowercase letters e.g., et al. xxx
-        text=re.sub(r'([a-z])([\.]*)([0-9])', r'\1\2 \3', text)                    # Space between letter and no.    
-        text=re.sub(r'(\s)([a-z0-9]+)([A-Z])([\w]+)', r'\1\2. \3\4', text)         # Put a '.' after a lowercase letter/number followed by Uppercase e.g., drains removed by day threeHe continued to 
-        text=re.sub(r'(\.)([\s]*)([\.]+)', r'\1', text)                            # Removing extra '.'s, if any   
-
         return text
            
     # check if a sentence is relevant to a keyphrase 
@@ -46,52 +57,50 @@ class data_extraction():
         return 0
     
     # Building training corpus  
-     def build_training_data(self):
-        os.system('ls '+self.path+'training_data/*.pdf> '+self.path+'list_training_data.txt')
-        fl=open(self.path+'list_training_data.txt', "r") 
-        trn_files = list(csv.reader(fl,delimiter='\n')) 
-        trn_files=[item for sublist in trn_files for item in sublist]
-        fl.close()
-    
-        fk=open(self.path+'keyphrases.txt', "r") 
-        keyphrases = list(csv.reader(fk,delimiter='\n'))
-        keyphrases = [item for sublist in keyphrases for item in sublist]
-        fk.close() 
-        count=0;
-        print('############### Preparing Training Data ############### \n')
-        fp=open(self.path+'training_relevant_class_data.csv',"w")
-        fn=open(self.path+'training_irrelevant_class_data.csv',"w")  
-        for item in trn_files:
-            count+=1
-            try:
-              doc = fitz.open(item, filetype = "pdf")        # PDF to text conversion  
-              texts=[] 
-              for page in doc:
-                 texts.append(page.getText().encode("utf8"))    
-              try:
-                  text=b''.join(texts)                       # If Fitz return the text in binary mode 
-                  text=text.decode('utf-8')
-              except:
-                  text=''.join(texts)
-            except:
-              text=''                  
-            text=self.text_refinement(text)                     # Cleaning text file 
-            fp.write('trn '+str(count)+',')
-            fn.write(str(count)+',')
-            text=re.sub(r',', r';', text)      # replacing , by ; to build the csv properly 
-            text=re.sub(r'\n', r' ', text)    # replacing \n by ; to build the csv properly
-            sentences=nltk.sent_tokenize(text)
-            for sentence in sentences:
-                if sentence!='':
-                    phrase_score=self.check_relevant_sentences(sentence,keyphrases)
-                    if phrase_score==1:
-                        fp.write(sentence+' ')
-                    elif phrase_score==0 and re.findall(r'\d+', sentence)==[]:
-                        fn.write(sentence+' ') 
-            fp.write('\n')
-            fn.write('\n')
-        fp.close()
-        fn.close()
+     def build_training_data(self):        
+         if os.path.isfile(self.path+'keyphrases.txt') and os.path.getsize(self.path+'keyphrases.txt') > 0:                      
+             fk=open(self.path+'keyphrases.txt', "r") 
+             keyphrases = list(csv.reader(fk,delimiter='\n'))
+             keyphrases = [item for sublist in keyphrases for item in sublist]
+             fk.close() 
+         else:                                                  # If the keyphrases file does not exist or is empty then exit 
+             print('Either keyphrases.txt does not exist or it is empty \n')
+             sys.exit(0)           
+# If the training data directory does not exist then exit
+         if not os.path.isdir(self.path+'training_data'):               
+            print('The directory training_data does not exist \n')
+            sys.exit(0)
+         trn_files=os.listdir(self.path+'training_data')
+         if trn_files==[]:
+            print('There is no training samples in the directory \n')
+         else:
+            count=0;
+            print('############### Preparing Training Data ############### \n')
+            fp=open(self.path+'training_relevant_class_data.csv',"w")
+            fn=open(self.path+'training_irrelevant_class_data.csv',"w")  
+            for item in trn_files:
+                count+=1
+                text=self.pdf_to_text(self.path+'training_data/'+item)                         # PDF to text conversion 
+                text=self.text_refinement(text)                     # Cleaning text file 
+                fp.write('trn '+str(count)+',')
+                fn.write(str(count)+',')
+                text=re.sub(r',', r';', text)      # replacing , by ; to build the csv properly 
+                text=re.sub(r'\n', r' ', text)     # replacing \n by ; to build the csv properly
+                if text!='':
+                    sentences=nltk.sent_tokenize(text)
+                    for sentence in sentences:
+                        if sentence!='':
+                            phrase_score=self.check_relevant_sentences(sentence,keyphrases)
+                            if phrase_score==1:
+                                fp.write(sentence+' ')
+                            elif phrase_score==0 and re.findall(r'\d+', sentence)==[]:
+                                fn.write(sentence+' ') 
+                    fp.write('\n')
+                    fn.write('\n')
+                else:
+                    print('Empty text for file: '+item+'\n') 
+         fp.close()
+         fn.close()
         
     # Selection of classifiers  
      def classification_pipeline(self,opt,no_term,trn_data,trn_cat):        
@@ -213,55 +222,53 @@ class data_extraction():
     # Classification pipeline                   
         clf,ext2=self.classification_pipeline(opt,no_term,trn_data,trn_cat)   
     # Classification of the test samples  
-        os.system('ls '+self.path+'test_data/*.pdf>'+self.path+'list_test_data.txt')
-        fi=open(self.path+'list_test_data.txt', "r") 
-        tst_files=list(csv.reader(fi,delimiter='\n'))
-        fi.close()    
-        tst_files=[item for sublist in tst_files for item in sublist]
+        if not os.path.isdir(self.path+'test_data'):
+            print('The directory test_data does not exist \n')
+            sys.exit(0)
+        else:
+            tst_files=os.listdir(self.path+'test_data')
         p3=0; count=0;
-        for item in tst_files:
-            count+=1
-            print(' Processing Test Data '+str(count)+'\n')
-            tst_data=[];   
-            try:
-                doc = fitz.open(item, filetype = "pdf")        # PDF to text conversion  
-                texts=[] 
-                for page in doc:
-                    texts.append(page.getText().encode("utf8"))                   
-                try:
-                    text=b''.join(texts)                      # If Fitz return the text in binary mode 
-                    text=text.decode('utf-8')                   
-                except:
-                    text=''.join(texts)
-            except:
-                text=''                  
-            # Preparing Test Samples 
-            text=self.text_refinement(text)                     # Cleaning text file 
-            if text!='':
-                sentences = tokenize.sent_tokenize(text)
-                for sentence in sentences:                       # Extracting sentences
-                    tst_data.append(sentence)  
-                    p3=p3+1
-            # Cretaing the output file
-                out = open(self.path+'output/tst'+str(count)+'.txt',"w")    
-                out.write('\n Using '+ext2+' Classifier: \n\n')   
-                out.write('Total No. of Sentences in Test Sample: '+str(p3)+'\n\n')
-                out.write('The relevant sentences are as follow: \n')
-            # Classification
-                predicted = clf.predict(tst_data) 
-                print(predicted)
-                nps=0
-                for i in range(0,len(predicted)):
- # Check if there is a number and the term 'SD'
-#                    if predicted[i] == 0 and re.findall(r'\d+', sentence)!=[]: 
-                    if predicted[i] == 0:
-                        nps=nps+1                 
-                        out.write('\n'+str(nps)+")  "+tst_data[i]+'\n')               
-                print("Total No. of Relevant Sentences of Test Sample"+str(count)+" : %d\n" %nps)
-            else:
-                out.write('Test file '+str(count)+'is empty \n') 
-                print('Test file '+str(count)+' is empty \n')
-        print('No of sentences belong to RELEVANT class of the training corpus: '+ str(p1)) 
-        print('No of sentences belong to IRRELEVANT class of the training corpus: '+ str(p2)) 
-        print('No of sentences belong to the TEST corpus: '+ str(p3)) 
+        if tst_files==[]:
+            print('There is no test samples in the directory \n')
+        else:
+            for item in tst_files:
+                count+=1
+                print(' Processing Test Data '+str(count)+'\n')
+                tst_data=[];   
+                text=self.pdf_to_text(self.path+'test_data/'+item)   
+                out = open(self.path+'output/tst'+str(count)+'.txt',"w") 
+                # Preparing Test Samples 
+                if text!='':
+                    text=self.text_refinement(text)                     # Cleaning text file 
+                    sentences = tokenize.sent_tokenize(text)
+                    for sentence in sentences:                       # Extracting sentences
+                        tst_data.append(sentence)  
+                        p3=p3+1
+                # Cretaing the output file
+                    out.write('\n Using '+ext2+' Classifier: \n\n')   
+                    out.write('Total No. of Sentences in Test Sample: '+str(p3)+'\n\n')
+                    out.write('The relevant sentences are as follow: \n')
+                # Classification
+                    predicted = clf.predict(tst_data) 
+                    nps=0
+                    for i in range(0,len(predicted)):
+                        if predicted[i] == 0: 
+                                nps=nps+1                 
+                                out.write('\n'+str(nps)+")  "+tst_data[i]+'\n')               
+                    print("Total No. of Relevant Sentences of Test Sample"+str(count)+" : %d\n" %nps)
+                    out.close()
+                else:
+                    out.write('Test file '+str(count)+'is empty \n') 
+                    print('Test file '+str(count)+' is empty \n')
+                out.close()
+            print('No of sentences belong to RELEVANT class of the training corpus: '+ str(p1)) 
+            print('No of sentences belong to IRRELEVANT class of the training corpus: '+ str(p2)) 
+            print('No of sentences belong to the TEST corpus: '+ str(p3)) 
+    
+
+    
+    
+    
+    
+    
     
