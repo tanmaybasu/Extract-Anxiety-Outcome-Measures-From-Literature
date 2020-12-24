@@ -14,4 +14,4 @@ de.build_training_data()
 de.data_extraction()
 ```
 
-An example code to implement the whole model is uploaded as `testing_data_extraction.py`. For any further query, you may reach out to me at welcometanmay@gmail.com
+An example code to implement the whole model is uploaded as `testing_data_extraction.py`. For any further query, comment or suggestion, you may reach out to me at welcometanmay@gmail.com
