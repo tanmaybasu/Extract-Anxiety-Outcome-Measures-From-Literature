@@ -6,9 +6,7 @@ The aim of this project is to build a framework using machine learning to extrac
 
 ## How to run the framework?
 
-The training data to train the classifier can be developed by running 'build_training_data.py' using PDF files of the publications. Pass the path of the project e.g., `/home/xyz/data_extraction/` as a parameter of this function. Create the following directories inside this path: 1) `training_data`, 2) `test_data`. Therefore store the PDFs for training and test data in the respective directories. The list of keyphrases to build the training data should be stored as `keyphrases.txt` in the main project path. Create a directory, called, `output` in the main project path to store the outputs of individual test samples. 
-
-Subsequently, run the following lines to get data elements of individual test samples. 
+Pass the path of the project e.g., `/home/xyz/data_extraction/` as a parameter of the main class. Create the following directories inside this path: 1) `training_data`, 2) `test_data`. Therefore keep the individual PDFs of training and test data in the respective directories. The list of keyphrases to build the training data should be stored as `keyphrases.txt` in the main project path. Create a directory, called, `output` in the main project path to store the outputs of individual test samples. Subsequently, run the following lines to get relevant sentences of anaxiety outcome measures for individual test samples. 
 
 ```
 de=data_extraction('/home/xyz/data_extraction/')   
