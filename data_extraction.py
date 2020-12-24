@@ -48,7 +48,7 @@ class data_extraction():
         text=re.sub(r'([a-zA-Z0-9])([\),.!?;-]+)([a-zA-Z])', r'\1\2 \3', text )    # Space between delimmiter and letter   
         return text
            
-    # check if a sentence is relevant to a keyphrase 
+# Check if a sentence is relevant to a keyphrase 
      def check_relevant_sentences(self,sentence,keyphrases):
         sentence = re.sub(r'[^a-zA-Z0-9.?:!$\n]', ' ', sentence)    # Remove special character 
         for phrase in keyphrases:
@@ -56,7 +56,7 @@ class data_extraction():
                 return 1
         return 0
     
-    # Building training corpus  
+# Building training corpus  
      def build_training_data(self):        
          if os.path.isfile(self.path+'keyphrases.txt') and os.path.getsize(self.path+'keyphrases.txt') > 0:                      
              fk=open(self.path+'keyphrases.txt', "r") 
@@ -66,7 +66,7 @@ class data_extraction():
          else:                                                  # If the keyphrases file does not exist or is empty then exit 
              print('Either keyphrases.txt does not exist or it is empty \n')
              sys.exit(0)           
-# If the training data directory does not exist then exit
+    # If the training data directory does not exist then exit
          if not os.path.isdir(self.path+'training_data'):               
             print('The directory training_data does not exist \n')
             sys.exit(0)
@@ -102,7 +102,7 @@ class data_extraction():
          fp.close()
          fn.close()
         
-    # Selection of classifiers  
+# Selection of classifiers and building classification pipeline 
      def classification_pipeline(self,opt,no_term,trn_data,trn_cat):        
         # Logistic Regression 
         if opt=='lr':
@@ -148,7 +148,7 @@ class data_extraction():
         else:
             print('Select a valid classifier \n')
             sys.exit(0)
-# Classificiation and feature selection pipelines
+    # Classificiation and feature selection pipelines
         if no_term==0:                                  # Use all the terms of the vocabulary
             pipeline = Pipeline([
                 ('vect', CountVectorizer(token_pattern=r'\b\w+\b',stop_words=stopwords.words('english'))),
@@ -178,7 +178,7 @@ class data_extraction():
         print(grid.best_params_)
         return clf,ext2
     
-    # Classification using the Gold Statndard after creating it from the raw text    
+# Classification of sentences containing desired data elements   
      def data_extraction(self):
         opt = input("Choose a classifier : \n\n\t 'lr' to select Logistic Regression" 
                        "\n\t 'r' to select Random Forest" 
@@ -264,11 +264,4 @@ class data_extraction():
             print('No of sentences belong to RELEVANT class of the training corpus: '+ str(p1)) 
             print('No of sentences belong to IRRELEVANT class of the training corpus: '+ str(p2)) 
             print('No of sentences belong to the TEST corpus: '+ str(p3)) 
-    
-
-    
-    
-    
-    
-    
-    
+ 
