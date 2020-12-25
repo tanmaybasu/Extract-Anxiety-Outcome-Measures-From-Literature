@@ -25,22 +25,17 @@ class data_extraction():
      def __init__(self,path='/home/data_extrcation/'):
         self.path = path
 
-# PDF to text conversion
+# PDF to text conversion        
      def pdf_to_text(self,file):        
         try:
             doc = fitz.open(file, filetype = "pdf")        # PDF to text conversion  
             texts=[] 
             for page in doc:
-                texts.append(page.getText().encode("utf8"))                   
-            try:
-                text=b''.join(texts)                      # If Fitz return the text in binary mode 
-                text=text.decode('utf-8')                   
-            except:
-                text=''.join(texts)
+                texts.append(page.getText()) 
+            text=''.join(texts)
         except:
             text='' 
         return text
-
 # Text refinement
      def text_refinement(self,text='hello'):
         text = re.sub(r'[^!"#$%&\'()*+,-./:;<=>?@[\]^_`{|}~\n\w]+',' ', text)      # Remove special characters e.g., emoticons-😄. The ^ in the beginning ensures that all the natural characters will be kept. 
@@ -84,7 +79,7 @@ class data_extraction():
                     text=self.pdf_to_text(self.path+'training_data/'+item)      # PDF to text conversion 
                     text=self.text_refinement(text)                             # Cleaning text file 
                     fp.write('trn '+str(count)+',')
-                    fn.write(str(count)+',')
+                    fn.write('trn '+str(count)+',')
                     text=re.sub(r',', r';', text)      # replacing , by ; to build the csv properly 
                     text=re.sub(r'\n', r' ', text)     # replacing \n by ' ' to build the csv properly
                     if text!='':
