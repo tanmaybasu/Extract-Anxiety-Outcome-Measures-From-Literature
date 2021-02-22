@@ -26,11 +26,18 @@ For any further query, comment or suggestion, you may reach out to me at welcome
 
 ## Citing
 
-@inproceedings{goswami19,
+`@inproceedings{goswami19,
+
 	title={An effective machine learning framework for data elements extraction from the literature of anxiety outcome measures to build systematic review},
+	
 	author={Goswami, Shubhaditya and Pal, Sukanya and Goldsworthy, Simon and Basu, Tanmay},
+	
 	booktitle={International Conference on Business Information Systems},
+	
 	pages={247--258},
+	
 	year={2019},
+	
 	organization={Springer}
-}
+	
+}`
