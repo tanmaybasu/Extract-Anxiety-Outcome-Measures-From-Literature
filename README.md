@@ -3,6 +3,8 @@ The aim of this project is to build a framework using machine learning to extrac
 
 [Shubhaditya Goswami, Sukanya Pal, Simon Goldsworthy and Tanmay Basu. An Effective Machine Learning Framework for Data Elements Extraction from the Literature of Anxiety Outcome Measures to Build Systematic Review. In Proceedings of International Conference on Business Information Systems, pp 247-258, 2019](https://link.springer.com/chapter/10.1007/978-3-030-20485-3_19).
 
+## Prerequsites
+Python 3 version, [Scikit-Learn](https://scikit-learn.org/0.16/install.html), [NLTK](https://www.nltk.org/install.html), [Fitz](https://pypi.org/project/fitz/), 
 
 ## How to run the framework?
 
@@ -16,4 +18,19 @@ de.build_training_data()
 de.data_extraction()
 ```
 
-An example code to implement the whole model is uploaded as `testing_data_extraction.py`. For any further query, comment or suggestion, you may reach out to me at welcometanmay@gmail.com
+An example code to implement the whole model is uploaded as `testing_data_extraction.py`. 
+
+## Contact
+
+For any further query, comment or suggestion, you may reach out to me at welcometanmay@gmail.com
+
+## Citing
+
+`@inproceedings{goswami19,
+	title={An effective machine learning framework for data elements extraction from the literature of anxiety outcome measures to build systematic review},
+	author={Goswami, Shubhaditya and Pal, Sukanya and Goldsworthy, Simon and Basu, Tanmay},
+	booktitle={International Conference on Business Information Systems},
+	pages={247--258},
+	year={2019},
+	organization={Springer}
+}`
