@@ -24,7 +24,7 @@ An example code to implement the whole model is uploaded as `testing_data_extrac
 
 For any further query, comment or suggestion, you may reach out to me at welcometanmay@gmail.com
 
-## Citing
+## Citation
 ```
 @inproceedings{goswami19anxiety,
 	title={An effective machine learning framework for data elements extraction from the literature of anxiety outcome measures to build systematic review},
